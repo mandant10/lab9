@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ai-cos-backend
+    env: docker
+    rootDir: ai_cos
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: JAVA_VERSION
+        value: "21"
+      - key: GEMINI_API_KEY
+        sync: false

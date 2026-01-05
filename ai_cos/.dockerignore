@@ -1,0 +1,14 @@
+.gradle
+build
+out
+.idea
+*.iml
+
+# Node/CF tooling not needed for backend container image
+node_modules
+cf
+ui
+
+# VCS
+.git
+.gitignore
