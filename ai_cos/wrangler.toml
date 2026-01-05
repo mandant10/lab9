@@ -1,0 +1,10 @@
+name = "ai-cos"
+main = "cf/worker.ts"
+compatibility_date = "2026-01-05"
+
+# UI dla aplikacji (statyczny frontend) + proxy /api/* do Render
+assets = { directory = "./ui", binding = "ASSETS" }
+
+[vars]
+# Ustaw w Cloudflare Variables (albo tu lokalnie):
+# BACKEND_URL = "https://twoj-serwis.onrender.com"
