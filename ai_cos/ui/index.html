@@ -382,11 +382,26 @@
                     },
                     body: JSON.stringify({ message: message })
                 });
-                
-                const data = await response.json();
-                
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    const text = await response.text();
+                    throw new Error(`Nieprawidłowa odpowiedź z serwera (HTTP ${response.status}): ${text}`);
+                }
+
+                if (!response.ok) {
+                    const msg = data?.error || data?.message || JSON.stringify(data);
+                    throw new Error(`HTTP ${response.status}: ${msg}`);
+                }
+
+                const assistantText = (data && typeof data.response === 'string')
+                    ? data.response
+                    : (data?.error ? `Błąd: ${data.error}` : `Brak pola 'response' w odpowiedzi: ${JSON.stringify(data)}`);
+
                 // Add assistant message
-                chatMessages.innerHTML += `<div class="message assistant">${escapeHtml(data.response)}</div>`;
+                chatMessages.innerHTML += `<div class="message assistant">${escapeHtml(assistantText)}</div>`;
             } catch (error) {
                 chatMessages.innerHTML += `<div class="message assistant">Błąd: ${escapeHtml(error.message)}</div>`;
             }
@@ -408,31 +423,60 @@
         async function addRandomClient() {
             try {
                 const response = await fetch('/api/add-client', { method: 'POST' });
-                const client = await response.json();
-                
-                showNotification(`Dodano klienta: ${client.firstName} ${client.lastName}`, 'success');
-                loadClients();
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const msg = data?.error || data?.message || 'Nieznany błąd serwera';
+                    throw new Error(`HTTP ${response.status}: ${msg}`);
+                }
+
+                if (!data || !data.firstName || !data.lastName) {
+                    throw new Error(`Nieoczekiwana odpowiedź: ${JSON.stringify(data)}`);
+                }
+
+                showNotification(`Dodano klienta: ${data.firstName} ${data.lastName}`, 'success');
+                await loadClients();
             } catch (error) {
-                showNotification('Błąd podczas dodawania klienta', 'error');
+                showNotification(`Błąd podczas dodawania klienta: ${error.message}`, 'error');
             }
         }
 
         async function addRandomOrder() {
             try {
                 const response = await fetch('/api/add-order', { method: 'POST' });
-                const order = await response.json();
-                
-                showNotification(`Dodano zamówienie: ${order.productName} dla ${order.clientName}`, 'success');
-                loadOrders();
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const msg = data?.error || data?.message || 'Nieznany błąd serwera';
+                    throw new Error(`HTTP ${response.status}: ${msg}`);
+                }
+
+                if (!data || !data.productName || !data.clientName) {
+                    throw new Error(`Nieoczekiwana odpowiedź: ${JSON.stringify(data)}`);
+                }
+
+                showNotification(`Dodano zamówienie: ${data.productName} dla ${data.clientName}`, 'success');
+                await loadOrders();
             } catch (error) {
-                showNotification('Błąd podczas dodawania zamówienia', 'error');
+                showNotification(`Błąd podczas dodawania zamówienia: ${error.message}`, 'error');
             }
         }
 
         async function loadClients() {
             try {
                 const response = await fetch('/api/clients');
-                const clients = await response.json();
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const msg = data?.error || data?.message || 'Nieznany błąd serwera';
+                    throw new Error(`HTTP ${response.status}: ${msg}`);
+                }
+
+                if (!Array.isArray(data)) {
+                    throw new Error(`Nieoczekiwana odpowiedź (nie jest tablicą): ${JSON.stringify(data)}`);
+                }
+
+                const clients = data;
                 
                 const clientsList = document.getElementById('clientsList');
                 document.getElementById('clientCount').textContent = clients.length;
@@ -450,13 +494,25 @@
                 `).join('');
             } catch (error) {
                 console.error('Error loading clients:', error);
+                showNotification(`Błąd ładowania klientów: ${error.message}`, 'error');
             }
         }
 
         async function loadOrders() {
             try {
                 const response = await fetch('/api/orders');
-                const orders = await response.json();
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const msg = data?.error || data?.message || 'Nieznany błąd serwera';
+                    throw new Error(`HTTP ${response.status}: ${msg}`);
+                }
+
+                if (!Array.isArray(data)) {
+                    throw new Error(`Nieoczekiwana odpowiedź (nie jest tablicą): ${JSON.stringify(data)}`);
+                }
+
+                const orders = data;
                 
                 const ordersList = document.getElementById('ordersList');
                 document.getElementById('orderCount').textContent = orders.length;
@@ -474,6 +530,7 @@
                 `).join('');
             } catch (error) {
                 console.error('Error loading orders:', error);
+                showNotification(`Błąd ładowania zamówień: ${error.message}`, 'error');
             }
         }
 
