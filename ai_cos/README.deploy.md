@@ -21,9 +21,14 @@ W folderze `ai_cos/` są pliki:
 
 Kroki:
 1. Ustaw `BACKEND_URL` w Cloudflare Worker Variables na URL z Render (np. `https://twoj-serwis.onrender.com`).
-2. Deploy workera z folderu `ai_cos/`:
-   - `npm install`
-   - `npm run deploy`
+2. Deploy workera:
+   - (lokalnie) z folderu `ai_cos/`:
+     - `npm install`
+     - `npm run deploy`
+   - (Cloudflare Workers Git integration) najprościej z repo root:
+     - ustaw Root directory na repo root (lub zostaw domyślne)
+     - komenda deploy: `npm ci && npm run deploy`
+     - konfiguracja jest w `wrangler.toml` w repo root
 
 Efekt:
 - Cloudflare serwuje UI z `ui/index.html`

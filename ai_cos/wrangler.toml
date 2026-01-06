@@ -3,7 +3,9 @@ main = "cf/worker.ts"
 compatibility_date = "2026-01-05"
 
 # UI dla aplikacji (statyczny frontend) + proxy /api/* do Render
-assets = { directory = "./ui", binding = "ASSETS" }
+[assets]
+directory = "./ui"
+binding = "ASSETS"
 
 [vars]
 # Ustaw w Cloudflare Variables (albo tu lokalnie):

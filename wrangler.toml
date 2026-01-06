@@ -1,0 +1,12 @@
+name = "ai-cos"
+main = "ai_cos/cf/worker.ts"
+compatibility_date = "2026-01-05"
+
+# Serve static UI and proxy /api/* to Render
+[assets]
+directory = "ai_cos/ui"
+binding = "ASSETS"
+
+[vars]
+# Set in Cloudflare Worker Variables:
+# BACKEND_URL = "https://twoj-serwis.onrender.com"
