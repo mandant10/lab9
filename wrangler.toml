@@ -1,4 +1,4 @@
-name = "ai-cos"
+name = "lab9"
 main = "ai_cos/cf/worker.ts"
 compatibility_date = "2026-01-05"
 
